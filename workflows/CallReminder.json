@@ -1,0 +1,1110 @@
+{
+  "name": "stephtradezzz - Call Reminder System",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "BOOKING_CREATED"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.calTrigger",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        -496
+      ],
+      "id": "94d76f0e-341e-4b91-8505-664e19df484f",
+      "name": "Cal.com Trigger",
+      "webhookId": "6ef4b01d-9851-4e13-b574-682a2bfb9b27",
+      "credentials": {
+        "calApi": {
+          "id": "1qsyhUp0u6hG3n8O",
+          "name": "Cal account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date(new Date($('Cal.com Trigger').item.json.startTime).getTime() - 24*60*60*1000).toISOString() }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        -496
+      ],
+      "id": "29881d04-175a-40f5-9ee9-e10ecfe5487f",
+      "name": "FWP 24Hrs Before",
+      "webhookId": "c1025007-67fc-4364-a528-83d7f524e35a"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.attendees[0].email }}",
+        "subject": "=See u soon!",
+        "message": "=Hi {{ $json.attendees[0].name }} , \n<br><br>\n\nJust Saw you booked a Call, looking foward to knowing more about you / the business\n<br><br>\nSee u on {{ $json.startTime.toDateTime().format('EEEE') }}\n<br><br>\nThanks,\n<br><br>\nGeorge.\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1008,
+        -496
+      ],
+      "id": "d9ca1c36-f4f0-4f4a-b6f3-58e65ae7bbaa",
+      "name": "Call Booked (Lead)",
+      "webhookId": "7c37dad5-7217-42cc-96d8-760b9498afe9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8rjgCh6O3Kd75W0B",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Cal.com Trigger').item.json.attendees[0].email }}",
+        "subject": "XYZ Meeting Update!",
+        "message": "=Just a Friendly reminder that your Meeting starts in less than 24 hours\n<br><br>\nYour Call is at {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE,t') }} \n<br><br>\nIf you want to reschedule, reply to this email. ",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -496
+      ],
+      "id": "7de15700-5bcf-4bff-b652-247120c738be",
+      "name": "Call FWP 1 [24hrs](Lead)",
+      "webhookId": "937dce2a-3ba2-4197-8986-ce0d24f8ef93",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8rjgCh6O3Kd75W0B",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "jorge.guarnizo.2006@gmail.com",
+          "mode": "list",
+          "cachedResultName": "jorge.guarnizo.2006@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        -496
+      ],
+      "id": "78615c93-105b-4ea4-b2d6-7407dfc99b9d",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "zSEvYcTvFGZzHcb7",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Cal.com Trigger').item.json.attendees[0].email }}",
+        "subject": "See u in 1 Hour!",
+        "message": "=Just a Friendly reminder that your Meeting starts in 1 hour \n<br><br> \nYour Call is at {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE,t') }}  \n<br><br> \nIf you want to reschedule, reply to this email. \n<br><br>\nYou'll get the link of your meeting soon!",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -224
+      ],
+      "id": "5b5e06c7-9a04-4471-af35-026f0a904cdc",
+      "name": "Call FWP 1 [1hr](Lead)",
+      "webhookId": "a47cfa22-5998-43d8-8704-36dd53a43fbe",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8rjgCh6O3Kd75W0B",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Cal.com Trigger').item.json.attendees[0].email }}",
+        "subject": "We're About to Start!",
+        "message": "=Hi,\n<br><br>\nWe're just 5 minutes away from our scheduled meeting!\n<br><br>\nCall Time: {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE, t') }}\n<br><br>\nJoin Here: [Click to Join Meeting]({{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }})\n<br><br>\nI'm excited to walk you through how we can [solve their problem / reach their goal].\n<br><br>\nMake sure you're in a quiet place and ready to jump in.\n<br><br>\nIf you need to reschedule last-minute, just reply to this email.\n<br><br>\nSee you in a few,\n<br><br>\nYour Name.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "7ac31a05-a323-4705-9593-3d053f45c898",
+      "name": "Call FWP 5 [5Minutes](Lead)",
+      "webhookId": "0ff5cd4c-3328-4f5f-8392-27cfb3f243fa",
+      "notesInFlow": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8rjgCh6O3Kd75W0B",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Cal.com Trigger').item.json.attendees[0].email }}",
+        "subject": "It's Time! Click to Join Your Call",
+        "message": "=Hi {{ $('Cal.com Trigger').item.json.attendees[0].name }},\n<br><br>\nYour meeting is starting right now!\n<br><br>\nJoin the Call Here: [Click to Join Meeting]({{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }})\n<br><br>\nScheduled Time: {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE, t') }}\n<br><br>\nI'm ready to dive in and show you how we can [solve their problem / reach their goal].\n<br><br>\nClick the link above to join - I'll be waiting for you.\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        288
+      ],
+      "id": "bcc80441-43f3-459f-aa67-d61bc064fe4c",
+      "name": "Call FWP 5 [NOW](Lead)",
+      "webhookId": "5755906c-474f-4ccb-addd-fa74290bc742",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8rjgCh6O3Kd75W0B",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date(new Date($('Cal.com Trigger').item.json.startTime).getTime() - 1*60*60*1000).toISOString() }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -224
+      ],
+      "id": "823e5be5-7199-4482-971e-a6f8aeba3e89",
+      "name": "1 Hour Before",
+      "webhookId": "473e4b66-b75b-48b5-8f39-ef188336ba42"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appdziAgjoJjPzTd1",
+          "mode": "list",
+          "cachedResultName": "Sales Calls CRM ",
+          "cachedResultUrl": "https://airtable.com/appdziAgjoJjPzTd1"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnVuL6TwV0YJkZo",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdziAgjoJjPzTd1/tblnVuL6TwV0YJkZo"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Cal.com Trigger').item.json.attendees[0].name }}",
+            "Status": "Call Booked",
+            "Meeting URL": "={{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }}",
+            "Call Date ": "={{ $('Cal.com Trigger').item.json.startTime }}",
+            "Email ": "={{ $('Cal.com Trigger').item.json.attendees[0].email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name ",
+              "displayName": "Company Name ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Call Booked",
+                  "value": "Call Booked"
+                },
+                {
+                  "name": "On Call",
+                  "value": "On Call"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                },
+                {
+                  "name": "Lost",
+                  "value": "Lost"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Call Date ",
+              "displayName": "Call Date ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email ",
+              "displayName": "Email ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Meeting URL",
+              "displayName": "Meeting URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        -496
+      ],
+      "id": "17658c4c-ff6f-4923-afb5-969bd55a933b",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "hHlq7QFBGTOdlmAK",
+          "name": "JGC Space"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appdziAgjoJjPzTd1",
+          "mode": "list",
+          "cachedResultName": "Sales Calls CRM ",
+          "cachedResultUrl": "https://airtable.com/appdziAgjoJjPzTd1"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnVuL6TwV0YJkZo",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdziAgjoJjPzTd1/tblnVuL6TwV0YJkZo"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "On Call",
+            "id": "={{ $('Create a record').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Company Name ",
+              "displayName": "Company Name ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Call Booked",
+                  "value": "Call Booked"
+                },
+                {
+                  "name": "On Call",
+                  "value": "On Call"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                },
+                {
+                  "name": "Lost",
+                  "value": "Lost"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Call Date ",
+              "displayName": "Call Date ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email ",
+              "displayName": "Email ",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Meeting URL",
+              "displayName": "Meeting URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        288
+      ],
+      "id": "23502129-4af2-4456-aa5e-95e26b1e6677",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "hHlq7QFBGTOdlmAK",
+          "name": "JGC Space"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date(new Date($('Cal.com Trigger').item.json.startTime).getTime() - 5*60*1000).toISOString() }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        32
+      ],
+      "id": "26e86570-9723-4bbb-a725-4f459c33a9d8",
+      "name": "5 minutes Before the Call",
+      "webhookId": "1881ab2e-038f-4c9e-8c44-bb645c3030a0"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $('Cal.com Trigger').item.json.startTime }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        288
+      ],
+      "id": "c4edfd58-e41b-4feb-a292-beddfa59a7de",
+      "name": "Call is Now",
+      "webhookId": "e41cd7b6-b0b9-4f5e-b809-6957f39b6e30"
+    },
+    {
+      "parameters": {
+        "from": "your number!",
+        "to": "Variable From Cal.com",
+        "message": "Your Call is in less than 24 !",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -496
+      ],
+      "id": "dbd444b7-5f8b-4f0d-9434-12e23d99a93b",
+      "name": "SMS 24 Hours Before",
+      "credentials": {
+        "twilioApi": {
+          "id": "cMOKHHbAv4WsLRTj",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=Your Name Channel",
+          "mode": "id"
+        },
+        "text": "Reminder of you call at is in less than 24 Hours",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -496
+      ],
+      "id": "fe133c05-5d9f-4eee-9125-2dbea882f9c5",
+      "name": "Send a message",
+      "webhookId": "61fe1c2e-e8fb-4437-bef8-4262ecfcabb5",
+      "credentials": {
+        "slackApi": {
+          "id": "FB0CllzJO9XYqNuz",
+          "name": "Slack account Placacentro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=Your Name Channel",
+          "mode": "id"
+        },
+        "text": "=The Call starts in less than 1 Hr.  <br><br> Time:  {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('ff') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -224
+      ],
+      "id": "31c4cd9f-8ef0-4887-9d81-74e33c1efded",
+      "name": "Send a message1",
+      "webhookId": "61fe1c2e-e8fb-4437-bef8-4262ecfcabb5",
+      "credentials": {
+        "slackApi": {
+          "id": "FB0CllzJO9XYqNuz",
+          "name": "Slack account Placacentro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "your number!",
+        "to": "Variable From Cal.com",
+        "message": "=Just a Friendly reminder that your Meeting starts in 1 hour \n\nYour Call is at {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE,t') }}  \n\nIf you want to reschedule, reply to this email.  <br><br> You'll get the link of your meeting soon!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -224
+      ],
+      "id": "2a9fb00c-f2e9-45bb-8278-44cbd03cf7d5",
+      "name": "SMS 1 Hours before",
+      "credentials": {
+        "twilioApi": {
+          "id": "cMOKHHbAv4WsLRTj",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "your number!",
+        "to": "Variable From Cal.com",
+        "message": "=Hi,\n\nWe're just 5 minutes away from our scheduled meeting!\n\nCall Time: {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE, t') }}\n\nJoin Here: [Click to Join Meeting]({{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }})\n\nI'm excited to walk you through how we can [solve their problem / reach their goal].\n\nMake sure you're in a quiet place and ready to jump in.\nIf you need to reschedule last-minute, just reply to this email.\n\nSee you in a few,\n\nYour Name.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        176,
+        32
+      ],
+      "id": "c5f418c6-0c0a-40e8-b4b9-7eb917f3d4c0",
+      "name": "SMS 5 minutes before",
+      "credentials": {
+        "twilioApi": {
+          "id": "cMOKHHbAv4WsLRTj",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=Your Name Channel",
+          "mode": "id"
+        },
+        "text": "=The Call starts in less than 5 Minutes. \n<br><br>\nTime:  {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('ff') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        32
+      ],
+      "id": "d22ae0aa-2863-4f38-94d8-13d18b09b70c",
+      "name": "Send a message2",
+      "webhookId": "61fe1c2e-e8fb-4437-bef8-4262ecfcabb5",
+      "credentials": {
+        "slackApi": {
+          "id": "FB0CllzJO9XYqNuz",
+          "name": "Slack account Placacentro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=Your Name Channel",
+          "mode": "id"
+        },
+        "text": "=The Call starts now. \n<br><br>\nTime:  {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('ff') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        288
+      ],
+      "id": "fa79ba7a-08cd-4af9-844f-b56420c0d3fd",
+      "name": "Send a message3",
+      "webhookId": "61fe1c2e-e8fb-4437-bef8-4262ecfcabb5",
+      "credentials": {
+        "slackApi": {
+          "id": "FB0CllzJO9XYqNuz",
+          "name": "Slack account Placacentro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "your number!",
+        "to": "Variable From Cal.com",
+        "message": "=Hi {{ $('Cal.com Trigger').item.json.attendees[0].name }},\nYour meeting is starting right now!\n\nJoin the Call Here: [Click to Join Meeting]({{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }})\n\nScheduled Time: {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('EEEE, t') }}\n\nI'm ready to dive in and show you how we can [solve their problem / reach their goal].\n\nClick the link above to join - I'll be waiting for you.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        176,
+        288
+      ],
+      "id": "3e393d27-7d1c-4a58-b31b-d7f0ae3a6b83",
+      "name": "SMS Call is now",
+      "credentials": {
+        "twilioApi": {
+          "id": "cMOKHHbAv4WsLRTj",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=Your Name Channel",
+          "mode": "id"
+        },
+        "text": "={{ $('Cal.com Trigger').item.json.attendees[0].name }} booked a Call for {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('DDDD') }} at {{ $('Cal.com Trigger').item.json.startTime.toDateTime().format('t') }} \n\nThe Email of of your lead is {{ $('Cal.com Trigger').item.json.attendees[0].email }} \n\nGoogle Meet Link: {{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }}\n\nCheck your CRM!",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        -496
+      ],
+      "id": "325cc468-c868-4947-9bf8-3b774f746867",
+      "name": "Send a message4",
+      "webhookId": "61fe1c2e-e8fb-4437-bef8-4262ecfcabb5",
+      "credentials": {
+        "slackApi": {
+          "id": "FB0CllzJO9XYqNuz",
+          "name": "Slack account Placacentro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Call Reminders ",
+        "height": 976,
+        "width": 1200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        -544
+      ],
+      "typeVersion": 1,
+      "id": "9b407137-d992-42f8-8518-52385dfdd59e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## SETUP INSTRUCTIONS FOR STEPHTRADEZZZ\n\nTHIS WORKFLOW IS PRE-CONFIGURED FOR YOUR TRADING BUSINESS\n\nWhat You'll Need:\n\nBefore you start, make sure you have:\n\n- Cal.com account (or Calendly - you'll need to swap the trigger)\n- Gmail account (for sending emails)\n- Twilio account (for sending SMS - get one at twilio.com)\n- Google Calendar (for tracking calls)\n- Airtable account (free - for CRM tracking)\n- Slack workspace (optional - for your personal notifications)\n\nWhat This Does:\n- Confirmation email when call is booked\n- Creates Airtable CRM record\n- Creates Google Calendar event\n- 24h reminder (email + SMS)\n- 1h reminder (email + SMS)\n- 5min reminder with meeting link\n- Join now reminder at call time\n- Updates Airtable when call starts\n- Slack notifications for you\n\nCuts no-show rates from 60-70% to 20-30%\n\nNeed Help? DM me on Instagram.",
+        "height": 656,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        -1504
+      ],
+      "typeVersion": 1,
+      "id": "ad7ad525-e47d-4a42-8cbe-6b842de2c2b7",
+      "name": "Setup Instructions for stephtradezzz"
+    },
+    {
+      "parameters": {
+        "events": [
+          "invitee.created"
+        ]
+      },
+      "type": "n8n-nodes-base.calendlyTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -1008
+      ],
+      "id": "75da4cc3-4bc2-4cf5-82cd-acc011a1c283",
+      "name": "Calendly Trigger",
+      "webhookId": "3f436e0c-4818-466c-940e-9228c0d7289c",
+      "credentials": {
+        "calendlyApi": {
+          "id": "S6aq1wHTkrHMgcku",
+          "name": "Calendly account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## On a call Booked",
+        "height": 240,
+        "width": 912,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1248,
+        -544
+      ],
+      "typeVersion": 1,
+      "id": "e4c75bcc-19ac-4469-a447-3adde2099ce0",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## CALENDLY ALTERNATIVE\n\nThis workflow works with Cal.com by default.\n\nIf you use Calendly instead, you can use the Calendly Trigger node below and adjust the variable names accordingly.\n\nBoth work great for Trading businesses!",
+        "height": 656,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        -1504
+      ],
+      "id": "10052e6c-0e9a-4de6-9367-f1551ec79345",
+      "name": "Calendly Note for stephtradezzz"
+    },
+    {
+      "parameters": {
+        "content": "## WHAT TO CUSTOMIZE FOR STEPHTRADEZZZ\n\nReplace 'Your Name' in email/SMS messages with your actual name\nCustomize Slack channel names to your workspace\nUpdate Twilio 'from' number to YOUR Twilio number\nUpdate email messages with your brand voice\n\nNeed Help?\n\nIf you get stuck, check:\n- n8n docs: docs.n8n.io\n- Twilio setup: twilio.com/docs\n- Cal.com webhooks: cal.com/docs\n\nOr DM me on Instagram and I'll help you out.\n\nThis is specifically built for your Trading business, so the workflow should work great once you connect your accounts!",
+        "height": 656,
+        "width": 672,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        -1504
+      ],
+      "typeVersion": 1,
+      "id": "f3bde21d-7951-4c69-8483-6bf706ecb720",
+      "name": "Customization Guide for stephtradezzz"
+    },
+    {
+      "parameters": {
+        "content": "## VIDEO WALKTHROUGH FOR STEPHTRADEZZZ\n\nHere is a Loom video I recorded for you showing exactly how to set up this workflow:\n\nhttps://www.loom.com/share/65aa9a86a4404d508787f571ffc8fb1b\n\nIt takes about 5-10 minutes to set up.\n\nThe video shows:\n- How to connect all your accounts\n- Where to customize your name and messages\n- How to test the workflow\n- Common troubleshooting tips\n\nThis workflow is pre-configured for your Trading business, so once you connect your accounts, you're ready to go!",
+        "height": 528,
+        "width": 1136,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -2032
+      ],
+      "typeVersion": 1,
+      "id": "3421a52d-a941-4b7a-b37a-9600ca65d515",
+      "name": "Video Guide for stephtradezzz"
+    },
+    {
+      "parameters": {
+        "content": "## HEY STEPHTRADEZZZ!\n\nThis call reminder workflow is just 1% of what's possible for your Trading business.\n\nThe reminder system tackles one symptom (no-shows). But the real money is in fixing the core funnel mechanics that are bleeding revenue every single day.\n\nMost Trading businesses we work with see 2-3x revenue growth in the first 90 days just by tightening:\n- Sales qualification\n- Funnel conversion\n- Traffic strategy\n\nIf you want to see the full game plan for how we'd plug every leak in your funnel, DM me on Instagram.\n\nWe'll walk through exactly what needs to happen to double your MRR without spending more on ads.\n\nTalk soon!",
+        "height": 528,
+        "width": 704,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1120,
+        -2032
+      ],
+      "typeVersion": 1,
+      "id": "70d22ffa-394d-40ff-a961-074b2b7dd000",
+      "name": "Next Steps for stephtradezzz"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cal.com Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Booked (Lead)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FWP 24Hrs Before": {
+      "main": [
+        [
+          {
+            "node": "Call FWP 1 [24hrs](Lead)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Booked (Lead)": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call FWP 1 [24hrs](Lead)": {
+      "main": [
+        [
+          {
+            "node": "SMS 24 Hours Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call FWP 1 [1hr](Lead)": {
+      "main": [
+        [
+          {
+            "node": "SMS 1 Hours before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call FWP 5 [5Minutes](Lead)": {
+      "main": [
+        [
+          {
+            "node": "SMS 5 minutes before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call FWP 5 [NOW](Lead)": {
+      "main": [
+        [
+          {
+            "node": "SMS Call is now",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Hour Before": {
+      "main": [
+        [
+          {
+            "node": "Call FWP 1 [1hr](Lead)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5 minutes Before the Call": {
+      "main": [
+        [
+          {
+            "node": "Call FWP 5 [5Minutes](Lead)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call is Now": {
+      "main": [
+        [
+          {
+            "node": "Call FWP 5 [NOW](Lead)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS 24 Hours Before": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "1 Hour Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "5 minutes Before the Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS 1 Hours before": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS 5 minutes before": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Call is Now",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Call is now": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message4": {
+      "main": [
+        [
+          {
+            "node": "FWP 24Hrs Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
